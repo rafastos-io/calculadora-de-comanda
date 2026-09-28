@@ -1,67 +1,174 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Comanda</title>
+    <meta name="description" content="Cadastre clientes e produtos, marque quem consumiu e divida a comanda por pessoa, com tarifa de 10% opcional.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function ()
+        {
+            var tema = "dark";
+
+            try
+            {
+                var salvo = localStorage.getItem("rafastos-theme");
+
+                if (salvo === "light" || salvo === "dark")
+                {
+                    tema = salvo;
+                }
+            }
+            catch (erro)
+            {
+                /* armazenamento indisponível: mantém o tema escuro */
+            }
+
+            document.documentElement.setAttribute("data-theme", tema);
+        })();
+    </script>
     <link rel="stylesheet" href="reset.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Calculadora de Comanda</h1>
+    <header class="topo rf-glass-nav">
+        <div class="topo__conteudo">
+            <div>
+                <h1 class="rf-h1 topo__titulo">Calculadora de Comanda</h1>
+                <p class="rf-caption topo__legenda">Cadastre quem consumiu o quê e divida a conta por pessoa.</p>
+            </div>
+            <button type="button" class="botao--icone rf-glass-control" id="botao-tema">
+                <svg class="icone icone--sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                <svg class="icone icone--lua" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+        </div>
     </header>
 
-    <main>
-        <form>
-            <fieldset>
-                <legend>Novo Cliente</legend>
-                <input type="text" id="nomeCliente" placeholder="Nome">
-                <label><input type="checkbox" name="tarifa" value="true">O cliente irá pagar a tarifa de 10%</label>
-                <input type="reset" value="+" id="adicionarCliente">
-            </fieldset>
-            <fieldset>
-                <legend>Novo Produto</legend>
-                <input type="text" id="nomeProduto" placeholder="Nome">
-                <input type="text" id="precoProduto" placeholder="Preço">
-                <input type="text" id="quantidadeProduto" placeholder="Quantidade">
-                <input type="reset" value="+" id="adicionarProduto">
-            </fieldset>
-        </form>
-
-        <section>
-            <div class="tabela">
-                <table id="clientes_cadastrados">
-                    <thead>
-                        <th>ID</th>
-                        <th>Nome</th>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+    <main class="pagina">
+        <section class="secao" aria-labelledby="titulo-cadastros">
+            <div class="secao__cabecalho">
+                <h2 class="rf-h3" id="titulo-cadastros">Cadastros</h2>
             </div>
 
-            <div class="tabela">
-                <table id="produtos_cadastrados">
-                    <thead>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Preço</th>
-                        <th>Quantidade</th>
-                        <th>Pessoas que consumiram</th>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="grade grade--cadastros">
+                <article class="cartao">
+                    <h3 class="rf-label">Novo cliente</h3>
+
+                    <div class="campo">
+                        <label class="rf-label campo__rotulo" for="nomeCliente">Nome</label>
+                        <input type="text" id="nomeCliente" placeholder="Ex.: Ana" autocomplete="off">
+                    </div>
+
+                    <label class="opcao">
+                        <input type="checkbox" id="tarifa">
+                        <span>O cliente paga a tarifa de 10%</span>
+                    </label>
+
+                    <p class="aviso" id="aviso-cliente" role="alert" hidden></p>
+
+                    <button type="button" class="botao botao--suave" id="adicionarCliente">
+                        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        Adicionar cliente
+                    </button>
+                </article>
+
+                <article class="cartao">
+                    <h3 class="rf-label">Novo produto</h3>
+
+                    <div class="campos">
+                        <div class="campo campo--nome">
+                            <label class="rf-label campo__rotulo" for="nomeProduto">Nome</label>
+                            <input type="text" id="nomeProduto" placeholder="Ex.: Pizza" autocomplete="off">
+                        </div>
+                        <div class="campo">
+                            <label class="rf-label campo__rotulo" for="precoProduto">Preço (R$)</label>
+                            <input type="text" id="precoProduto" class="rf-code" inputmode="decimal" placeholder="0,00" autocomplete="off">
+                        </div>
+                        <div class="campo">
+                            <label class="rf-label campo__rotulo" for="quantidadeProduto">Quantidade</label>
+                            <input type="text" id="quantidadeProduto" class="rf-code" inputmode="numeric" placeholder="1" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <p class="aviso" id="aviso-produto" role="alert" hidden></p>
+
+                    <button type="button" class="botao botao--suave" id="adicionarProduto">
+                        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        Adicionar produto
+                    </button>
+                </article>
             </div>
         </section>
 
-        <section>
-            <input type="button" value="Calcular Gastos Individuais" id="calcular">
+        <section class="secao" aria-labelledby="titulo-comanda">
+            <div class="secao__cabecalho">
+                <h2 class="rf-h3" id="titulo-comanda">Comanda</h2>
+                <p class="rf-caption texto-sutil">Marque, em cada produto, as pessoas que consumiram.</p>
+            </div>
 
-            <div id="notas_fiscais"></div>
+            <div class="grade grade--tabelas">
+                <article class="painel">
+                    <h3 class="rf-label">Clientes</h3>
+                    <div class="tabela">
+                        <table id="clientes_cadastrados" aria-label="Clientes cadastrados">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Tarifa</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <p class="vazio" id="vazio-clientes">Nenhum cliente cadastrado ainda.</p>
+                </article>
+
+                <article class="painel">
+                    <h3 class="rf-label">Produtos</h3>
+                    <div class="tabela">
+                        <table id="produtos_cadastrados" aria-label="Produtos cadastrados">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Produto</th>
+                                    <th>Preço</th>
+                                    <th>Qtd</th>
+                                    <th>Pessoas que consumiram</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <p class="vazio" id="vazio-produtos">Nenhum produto cadastrado ainda.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="secao" aria-labelledby="titulo-apuracao">
+            <div class="secao__cabecalho secao__cabecalho--apuracao">
+                <div>
+                    <h2 class="rf-h3" id="titulo-apuracao">Apuração</h2>
+                    <p class="rf-caption texto-sutil">O valor do produto é dividido entre quem consumiu; a tarifa de 10% incide sobre o subtotal de quem a paga.</p>
+                </div>
+                <button type="button" class="botao botao--primario" id="calcular">Calcular gastos individuais</button>
+            </div>
+
+            <p class="aviso" id="aviso-calculo" role="alert" hidden></p>
+
+            <div class="notas" id="notas_fiscais"></div>
         </section>
     </main>
 
+    <footer class="rodape">
+        <p class="rf-caption texto-sutil">Calculadora de Comanda · interface com o <span class="rf-code">Design System Rafastos.io</span></p>
+    </footer>
+
+    <script src="logica.js"></script>
     <script src="funcoes.js"></script>
 </body>
 </html>

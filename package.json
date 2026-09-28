@@ -1,0 +1,9 @@
+{
+  "name": "calculadora-de-comanda",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Calculadora que divide uma comanda por pessoa, com tarifa opcional de 10%.",
+  "scripts": {
+    "test": "node testes.js"
+  }
+}

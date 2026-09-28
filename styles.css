@@ -1,190 +1,867 @@
-body
+/**
+ * Calculadora de Comanda — visual do Design System Rafastos.io
+ *
+ * Tokens fiéis ao pacote @rafastos/ui (packages/ui/src/styles/tokens):
+ * base neutra extrema, um único acento residual (Violet AI), direção flat
+ * sem bordas — a delimitação é superfície + sombra. Vidro leve só na
+ * navegação fixa. Temas escuro (padrão) e claro via data-theme.
+ */
+
+/* ————————————————————————————————————————————————————————————————
+   Tokens
+   ———————————————————————————————————————————————————————————————— */
+
+:root
 {
-    font-family: sans-serif;
-    background: url('fundo.jpg');
+    /* Brand hues (imutáveis) */
+    --rf-obsidian: #0b0f19;
+    --rf-steel: #334155;
+    --rf-mist: #94a3b8;
+    --rf-white: #f8fafc;
+    --rf-violet-ai: #7c3aed;
+
+    /* Escada neutra (preto → cinza → branco) */
+    --rf-neutral-0: var(--rf-white);
+    --rf-neutral-50: color-mix(in srgb, var(--rf-white) 96%, var(--rf-obsidian));
+    --rf-neutral-100: color-mix(in srgb, var(--rf-white) 92%, var(--rf-obsidian));
+    --rf-neutral-200: color-mix(in srgb, var(--rf-white) 82%, var(--rf-obsidian));
+    --rf-neutral-300: color-mix(in srgb, var(--rf-white) 70%, var(--rf-obsidian));
+    --rf-neutral-400: color-mix(in srgb, var(--rf-white) 56%, var(--rf-obsidian));
+    --rf-neutral-500: color-mix(in srgb, var(--rf-white) 42%, var(--rf-obsidian));
+    --rf-neutral-600: color-mix(in srgb, var(--rf-white) 30%, var(--rf-obsidian));
+    --rf-neutral-700: color-mix(in srgb, var(--rf-white) 20%, var(--rf-obsidian));
+    --rf-neutral-800: color-mix(in srgb, var(--rf-white) 12%, var(--rf-obsidian));
+    --rf-neutral-900: color-mix(in srgb, var(--rf-white) 6%, var(--rf-obsidian));
+    --rf-neutral-950: var(--rf-obsidian);
+
+    --rf-mist-soft: color-mix(in srgb, var(--rf-mist) 18%, var(--rf-white));
+
+    /* Tipografia */
+    --rf-font-sans: "Space Grotesk", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --rf-font-mono: "IBM Plex Mono", "Consolas", ui-monospace, monospace;
+
+    --rf-text-h1: 2.25rem;
+    --rf-text-h1-lg: 3.75rem;
+    --rf-text-h2: 1.875rem;
+    --rf-text-h2-lg: 2.75rem;
+    --rf-text-h3: 1.5rem;
+    --rf-text-h3-lg: 1.75rem;
+    --rf-text-body: 1rem;
+    --rf-text-label: 0.875rem;
+    --rf-text-caption: 0.75rem;
+    --rf-text-code: 0.875rem;
+
+    --rf-leading-h1: 1.1;
+    --rf-leading-h2: 1.15;
+    --rf-leading-h3: 1.25;
+    --rf-leading-body: 1.55;
+    --rf-leading-label: 1.4;
+    --rf-leading-caption: 1.5;
+    --rf-leading-code: 1.5;
+
+    --rf-tracking-h1: -0.035em;
+    --rf-tracking-h2: -0.025em;
+    --rf-tracking-h3: -0.012em;
+
+    --rf-weight-regular: 400;
+    --rf-weight-semibold: 600;
+    --rf-weight-bold: 700;
+
+    /* Espaço, raio e movimento */
+    --rf-space-1: 0.25rem;
+    --rf-space-2: 0.5rem;
+    --rf-space-3: 0.75rem;
+    --rf-space-4: 1rem;
+    --rf-space-5: 1.5rem;
+    --rf-space-6: 2rem;
+    --rf-space-7: 3rem;
+    --rf-space-8: 4rem;
+    --rf-space-9: 6rem;
+
+    --rf-radius-control: 0.5rem;
+    --rf-radius-card: 0.75rem;
+    --rf-radius-panel: 1rem;
+    --rf-radius-surface: 1.5rem;
+    --rf-radius-full: 9999px;
+
+    --rf-duration-fast: 150ms;
+    --rf-duration: 220ms;
+    --rf-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+    --rf-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+    --rf-glass-radius: 24px;
+    --rf-glass-radius-control: 9999px;
 }
 
-header
+/* Tema escuro (padrão) */
+:root,
+html[data-theme="dark"]
 {
-    width: 100%;
-    padding: 2.5em;
-    background-color: gray;
+    --rf-bg: var(--rf-obsidian);
+    --rf-surface: var(--rf-neutral-900);
+    --rf-surface-elevated: var(--rf-neutral-800);
+    --rf-text: var(--rf-white);
+    --rf-text-muted-foreground: var(--rf-neutral-400);
+    --rf-border: transparent;
+    --rf-field: color-mix(in srgb, var(--rf-neutral-500) 22%, transparent);
+    --rf-accent: var(--rf-neutral-300);
+    --rf-action: var(--rf-white);
+    --rf-action-foreground: var(--rf-obsidian);
+    --rf-action-soft: color-mix(in srgb, var(--rf-neutral-500) 22%, transparent);
+    --rf-action-hover: var(--rf-neutral-200);
+    --rf-hover: var(--rf-neutral-900);
+    --rf-selection: var(--rf-neutral-700);
+    --rf-focus: var(--rf-white);
+    --rf-success: #4ade80;
+    --rf-warning: #fbbf24;
+    --rf-error: #fb7185;
+    --rf-status-on: var(--rf-obsidian);
+
+    --rf-shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --rf-shadow-elevated: 0 12px 28px -12px rgba(0, 0, 0, 0.5);
+
+    --rf-glass-fill-strong: rgba(11, 15, 25, 0.78);
+    --rf-glass-blur: 16px;
+    --rf-glass-saturate: 1.15;
+    --rf-glass-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.45);
+    --rf-glass-glow: color-mix(in srgb, var(--rf-white) 6%, transparent);
+    --rf-glass-fallback: rgba(11, 15, 25, 1);
+
+    --rf-ambient-a: color-mix(in srgb, var(--rf-white) 4%, transparent);
+    --rf-ambient-b: color-mix(in srgb, var(--rf-steel) 10%, transparent);
+    --rf-ambient-c: color-mix(in srgb, var(--rf-steel) 18%, var(--rf-obsidian));
+
+    --rf-content-panel: var(--rf-surface);
+
+    color-scheme: dark;
+}
+
+/* Tema claro */
+html[data-theme="light"]
+{
+    --rf-bg: var(--rf-neutral-50);
+    --rf-surface: var(--rf-white);
+    --rf-surface-elevated: var(--rf-neutral-100);
+    --rf-text: var(--rf-obsidian);
+    --rf-text-muted-foreground: var(--rf-steel);
+    --rf-border: transparent;
+    --rf-field: var(--rf-neutral-100);
+    --rf-accent: var(--rf-steel);
+    --rf-action: var(--rf-obsidian);
+    --rf-action-foreground: var(--rf-white);
+    --rf-action-soft: color-mix(in srgb, var(--rf-neutral-400) 20%, transparent);
+    --rf-action-hover: var(--rf-neutral-800);
+    --rf-hover: var(--rf-neutral-100);
+    --rf-selection: var(--rf-neutral-200);
+    --rf-focus: var(--rf-obsidian);
+    --rf-success: #147639;
+    --rf-warning: #92400e;
+    --rf-error: #be123c;
+    --rf-status-on: var(--rf-white);
+
+    --rf-shadow-subtle: 0 1px 3px rgba(11, 15, 25, 0.07);
+    --rf-shadow-elevated: 0 12px 28px -14px rgba(11, 15, 25, 0.12);
+
+    --rf-glass-fill-strong: rgba(255, 255, 255, 0.8);
+    --rf-glass-blur: 18px;
+    --rf-glass-saturate: 1.15;
+    --rf-glass-shadow: 0 12px 30px -18px rgba(11, 15, 25, 0.16);
+    --rf-glass-glow: color-mix(in srgb, var(--rf-obsidian) 4%, transparent);
+    --rf-glass-fallback: color-mix(in srgb, var(--rf-white) 94%, var(--rf-mist));
+
+    --rf-ambient-a: color-mix(in srgb, var(--rf-obsidian) 3%, transparent);
+    --rf-ambient-b: color-mix(in srgb, var(--rf-steel) 5%, transparent);
+    --rf-ambient-c: color-mix(in srgb, var(--rf-mist-soft) 28%, var(--rf-white));
+
+    --rf-content-panel: var(--rf-surface);
+
+    color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce)
+{
+    :root
+    {
+        --rf-duration-fast: 0ms;
+        --rf-duration: 0ms;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce)
+{
+    :root,
+    html[data-theme="dark"],
+    html[data-theme="light"]
+    {
+        --rf-glass-fill-strong: var(--rf-glass-fallback);
+        --rf-glass-blur: 0px;
+        --rf-glass-saturate: 1;
+    }
+}
+
+/* ————————————————————————————————————————————————————————————————
+   Base e utilitários
+   ———————————————————————————————————————————————————————————————— */
+
+[hidden]
+{
+    display: none !important;
+}
+
+*
+{
     box-sizing: border-box;
 }
 
-header h1
+html
 {
-    color: rgb(255, 255, 255);
-    text-align: center;
-    font-size: 2em;
-    text-shadow: 3px 2px rgb(2, 23, 54);
-    font-weight: bold;
+    background-color: var(--rf-bg);
 }
 
-main
+body
 {
-    padding: 5em 1em;
+    font-family: var(--rf-font-sans);
+    font-size: var(--rf-text-body);
+    font-weight: var(--rf-weight-regular);
+    line-height: var(--rf-leading-body);
+    color: var(--rf-text);
+    background-color: var(--rf-bg);
+    background-image:
+        radial-gradient(ellipse 80% 55% at 12% -10%, var(--rf-ambient-a), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 92% 8%, var(--rf-ambient-b), transparent 50%),
+        radial-gradient(ellipse 90% 70% at 50% 110%, var(--rf-ambient-c), transparent 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
 }
 
-fieldset
+::selection
 {
-    background-color: rgb(62, 97, 55);
-    border: 2px groove whitesmoke;
-    width: 50%;
+    background-color: var(--rf-selection);
+}
+
+:focus-visible
+{
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--rf-focus) 50%, transparent);
+}
+
+button
+{
+    font: inherit;
+    color: inherit;
+}
+
+.rf-h1
+{
+    font-family: var(--rf-font-sans);
+    font-size: clamp(var(--rf-text-h1), 4vw, var(--rf-text-h1-lg));
+    font-weight: var(--rf-weight-bold);
+    line-height: var(--rf-leading-h1);
+    letter-spacing: var(--rf-tracking-h1);
+}
+
+.rf-h3
+{
+    font-size: clamp(var(--rf-text-h3), 2vw, var(--rf-text-h3-lg));
+    font-weight: var(--rf-weight-semibold);
+    line-height: var(--rf-leading-h3);
+    letter-spacing: var(--rf-tracking-h3);
+}
+
+.rf-label
+{
+    font-size: var(--rf-text-label);
+    font-weight: var(--rf-weight-semibold);
+    line-height: var(--rf-leading-label);
+}
+
+.rf-caption
+{
+    font-size: var(--rf-text-caption);
+    font-weight: var(--rf-weight-regular);
+    line-height: var(--rf-leading-caption);
+}
+
+.rf-code
+{
+    font-family: var(--rf-font-mono);
+    font-size: var(--rf-text-code);
+    font-weight: var(--rf-weight-regular);
+    line-height: var(--rf-leading-code);
+}
+
+.texto-sutil
+{
+    color: var(--rf-text-muted-foreground);
+}
+
+/* Vidro leve — uso pontual na navegação fixa */
+.rf-glass-nav
+{
+    background-color: var(--rf-glass-fill-strong);
+    box-shadow: var(--rf-glass-shadow), 0 10px 40px var(--rf-glass-glow);
+    backdrop-filter: blur(var(--rf-glass-blur)) saturate(var(--rf-glass-saturate));
+    -webkit-backdrop-filter: blur(var(--rf-glass-blur)) saturate(var(--rf-glass-saturate));
+}
+
+.rf-glass-control
+{
+    border-radius: var(--rf-glass-radius-control);
+}
+
+.rf-content-panel
+{
+    background-color: var(--rf-content-panel);
+    border-radius: var(--rf-radius-panel);
+    box-shadow: var(--rf-shadow-subtle);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))
+{
+    .rf-glass-nav
+    {
+        background-color: var(--rf-glass-fallback);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
+/* ————————————————————————————————————————————————————————————————
+   Estrutura
+   ———————————————————————————————————————————————————————————————— */
+
+.topo
+{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.topo__conteudo
+{
+    max-width: 1200px;
     margin: 0 auto;
+    padding: var(--rf-space-4) var(--rf-space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rf-space-4);
 }
 
-input[type='text']
+.topo__titulo
 {
-    border-radius: 5px;
-    padding: 1em;
+    margin-bottom: var(--rf-space-1);
 }
 
-fieldset
+.topo__legenda
 {
-    color: azure;
-    border-radius: 10px;
+    color: var(--rf-text-muted-foreground);
 }
 
-#adicionarProduto, #adicionarCliente
+.pagina
 {
-    border-radius: 50px;
-    border: 2px solid transparent;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--rf-space-7) var(--rf-space-6) var(--rf-space-8);
+}
+
+.secao
+{
+    margin-bottom: var(--rf-space-7);
+}
+
+.secao__cabecalho
+{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--rf-space-4);
+    margin-bottom: var(--rf-space-5);
+}
+
+.secao__cabecalho--apuracao
+{
+    align-items: center;
+}
+
+.rodape
+{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--rf-space-6) var(--rf-space-6);
+}
+
+/* ————————————————————————————————————————————————————————————————
+   Grades e cartões
+   ———————————————————————————————————————————————————————————————— */
+
+.grade
+{
+    display: grid;
+    gap: var(--rf-space-5);
+}
+
+.grade--cadastros
+{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grade--tabelas
+{
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: start;
+}
+
+.cartao
+{
+    background-color: var(--rf-surface);
+    border-radius: var(--rf-radius-card);
+    box-shadow: var(--rf-shadow-subtle);
+    padding: var(--rf-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--rf-space-4);
+}
+
+.painel
+{
+    background-color: var(--rf-content-panel);
+    border-radius: var(--rf-radius-panel);
+    box-shadow: var(--rf-shadow-subtle);
+    padding: var(--rf-space-5);
+}
+
+.painel h3
+{
+    margin-bottom: var(--rf-space-4);
+}
+
+/* ————————————————————————————————————————————————————————————————
+   Formulários
+   ———————————————————————————————————————————————————————————————— */
+
+.campos
+{
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--rf-space-4);
+}
+
+.campo
+{
+    display: flex;
+    flex-direction: column;
+    gap: var(--rf-space-2);
+}
+
+.campo__rotulo
+{
+    color: var(--rf-text-muted-foreground);
+}
+
+input[type="text"]
+{
+    width: 100%;
+    min-height: 44px;
+    padding: var(--rf-space-3) var(--rf-space-4);
+    border: none;
+    border-radius: var(--rf-radius-control);
+    background-color: var(--rf-field);
+    color: var(--rf-text);
+    font: inherit;
+    transition: background-color var(--rf-duration-fast) var(--rf-ease-standard);
+}
+
+input[type="text"]::placeholder
+{
+    color: var(--rf-text-muted-foreground);
+}
+
+input[type="text"]:hover
+{
+    background-color: color-mix(in srgb, var(--rf-field) 70%, var(--rf-surface-elevated));
+}
+
+input.rf-code
+{
+    font-family: var(--rf-font-mono);
+    font-size: var(--rf-text-code);
+}
+
+.opcao
+{
+    display: flex;
+    align-items: center;
+    gap: var(--rf-space-2);
+    font-size: var(--rf-text-label);
+    line-height: var(--rf-leading-label);
     cursor: pointer;
-    background-color: rgb(142, 197, 230);
-    width: 30px;
-    font-size: 1.1em;
+    min-height: 44px;
 }
 
-#adicionarProduto:hover, #adicionarCliente:hover
+input[type="checkbox"]
 {
-    border: 2px solid rgb(2, 34, 75);
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--rf-action);
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
-section
+/* ————————————————————————————————————————————————————————————————
+   Botões
+   ———————————————————————————————————————————————————————————————— */
+
+.botao
 {
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rf-space-2);
+    min-height: 44px;
+    padding: var(--rf-space-3) var(--rf-space-4);
+    border: none;
+    border-radius: var(--rf-radius-control);
+    font-size: var(--rf-text-label);
+    font-weight: var(--rf-weight-semibold);
+    line-height: var(--rf-leading-label);
+    cursor: pointer;
+    transition:
+        background-color var(--rf-duration-fast) var(--rf-ease-standard),
+        transform var(--rf-duration-fast) var(--rf-ease-standard);
 }
+
+.botao:active
+{
+    transform: translateY(1px);
+}
+
+.botao--suave
+{
+    background-color: var(--rf-action-soft);
+    color: var(--rf-text);
+    align-self: flex-start;
+}
+
+.botao--suave:hover
+{
+    background-color: color-mix(in srgb, var(--rf-action-soft) 70%, var(--rf-surface-elevated));
+}
+
+.botao--primario
+{
+    background-color: var(--rf-action);
+    color: var(--rf-action-foreground);
+}
+
+.botao--primario:hover
+{
+    background-color: var(--rf-action-hover);
+}
+
+.botao--icone
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background-color: transparent;
+    color: var(--rf-text);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color var(--rf-duration-fast) var(--rf-ease-standard);
+}
+
+.botao--icone:hover
+{
+    background-color: var(--rf-action-soft);
+}
+
+.icone
+{
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+html[data-theme="dark"] .icone--lua
+{
+    display: none;
+}
+
+html[data-theme="light"] .icone--sol
+{
+    display: none;
+}
+
+/* ————————————————————————————————————————————————————————————————
+   Tabelas
+   ———————————————————————————————————————————————————————————————— */
 
 .tabela
 {
-    display: inline-block;
-    width: 30%;
-    vertical-align: top;
-}
-
-.tabela:last-child
-{
-    width: 50%;
-}
-
-.tabela:first-child
-{
-    margin-right: 2em;
+    overflow-x: auto;
 }
 
 .tabela table
 {
-    margin: 5em 0;
     width: 100%;
-    text-align: center;
+    border-collapse: separate;
+    border-spacing: 0 var(--rf-space-1);
 }
 
 .tabela th
 {
-    padding: 1em;
-    background-color: rgb(126, 196, 126);
-    border: 3px solid black;
+    text-align: left;
+    padding: 0 var(--rf-space-3) var(--rf-space-1);
+    font-size: var(--rf-text-caption);
+    font-weight: var(--rf-weight-semibold);
+    line-height: var(--rf-leading-caption);
+    color: var(--rf-text-muted-foreground);
+    white-space: nowrap;
 }
 
 .tabela td
 {
-    padding: 1em;
-    background-color: rgb(240, 222, 121);
-    border: 3px solid black;
+    padding: var(--rf-space-3);
+    background-color: var(--rf-field);
+    vertical-align: middle;
 }
 
-fieldset
+.tabela tr td:first-child
 {
-    margin-bottom: 2em;
-    padding: 1em;
+    border-radius: var(--rf-radius-control) 0 0 var(--rf-radius-control);
 }
 
-#calcular
+.tabela tr td:last-child
 {
-    background-color: rgb(40, 112, 172);
-    color: azure;
-    width: 200px;
-    height: 50px;
-    border-radius: 5px;
-    cursor: pointer;
+    border-radius: 0 var(--rf-radius-control) var(--rf-radius-control) 0;
 }
 
-#notas_fiscais
+.celula--id
 {
-    width: 80%;
-    background-color: rgb(168, 210, 218);
-    border-radius: 20px;
-    border: 3px solid black;
-    margin: 2em auto;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 1em 0;
+    width: 1%;
+    color: var(--rf-text-muted-foreground);
 }
 
-#notas_fiscais h2
-{
-    text-align: center;
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #2b5a25;
-    margin-bottom: 1em;
-}
-
-.nota_individual
-{
-    width: 30%;
-    padding: 0.5em;
-    display: inline-block;
-    margin-bottom: 1em;
-}
-
-.nota_individual:nth-child(3n+2)
-{
-    margin-right: 1%;
-    margin-left: 1%;
-}
-
-.nota_individual table
-{
-    margin: 5em 0;
-    width: 80%;
-    text-align: center;
-    margin: 0 auto;
-    font-size: 0.8em;
-}
-
-.nota_individual th
-{
-    padding: 1em;
-    background-color: rgb(126, 196, 126);
-    border: 3px solid black;
-}
-
-.nota_individual td
-{
-    padding: 1em;
-    background-color: rgb(240, 222, 121);
-    border: 3px solid black;
-}
-
-.nota_individual tfoot td
-{
-    background-color: gray;
-}
-
-.nota_individual tfoot td:first-child
+.celula--valor,
+.celula--num
 {
     text-align: right;
+    white-space: nowrap;
+}
+
+.consumidores
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--rf-space-2);
+}
+
+.opcao-consumo
+{
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rf-space-2);
+    padding: var(--rf-space-1) var(--rf-space-3);
+    min-height: 36px;
+    border-radius: var(--rf-radius-full);
+    background-color: color-mix(in srgb, var(--rf-neutral-500) 16%, transparent);
+    font-size: var(--rf-text-label);
+    line-height: var(--rf-leading-label);
+    cursor: pointer;
+    transition: background-color var(--rf-duration-fast) var(--rf-ease-standard);
+}
+
+.opcao-consumo:hover
+{
+    background-color: var(--rf-action-soft);
+}
+
+.opcao-consumo:has(input:checked)
+{
+    background-color: var(--rf-action);
+    color: var(--rf-action-foreground);
+}
+
+.opcao-consumo input[type="checkbox"]
+{
+    width: 1rem;
+    height: 1rem;
+}
+
+html[data-theme="light"] .opcao-consumo
+{
+    background-color: var(--rf-neutral-200);
+}
+
+.vazio
+{
+    margin-top: var(--rf-space-3);
+    padding: var(--rf-space-4);
+    border-radius: var(--rf-radius-control);
+    background-color: var(--rf-field);
+    color: var(--rf-text-muted-foreground);
+    font-size: var(--rf-text-caption);
+    line-height: var(--rf-leading-caption);
+    text-align: center;
+}
+
+.selo
+{
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--rf-space-2);
+    border-radius: var(--rf-radius-full);
+    background-color: var(--rf-action-soft);
+    color: var(--rf-text);
+    font-size: var(--rf-text-caption);
+    font-weight: var(--rf-weight-semibold);
+    line-height: var(--rf-leading-caption);
+    white-space: nowrap;
+}
+
+html[data-theme="light"] .selo
+{
+    background-color: var(--rf-neutral-200);
+}
+
+/* ————————————————————————————————————————————————————————————————
+   Avisos
+   ———————————————————————————————————————————————————————————————— */
+
+.aviso
+{
+    padding: var(--rf-space-3) var(--rf-space-4);
+    border-radius: var(--rf-radius-control);
+    font-size: var(--rf-text-label);
+    line-height: var(--rf-leading-label);
+}
+
+.aviso--erro
+{
+    background-color: color-mix(in srgb, var(--rf-error) 16%, transparent);
+    color: var(--rf-error);
+}
+
+.aviso--atencao
+{
+    background-color: color-mix(in srgb, var(--rf-warning) 16%, transparent);
+    color: var(--rf-warning);
+}
+
+.aviso--ok
+{
+    background-color: color-mix(in srgb, var(--rf-success) 16%, transparent);
+    color: var(--rf-success);
+}
+
+/* ————————————————————————————————————————————————————————————————
+   Notas fiscais (apuração)
+   ———————————————————————————————————————————————————————————————— */
+
+.notas
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--rf-space-4);
+}
+
+.nota
+{
+    padding: var(--rf-space-5);
+}
+
+.nota__cabecalho
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rf-space-2);
+    margin-bottom: var(--rf-space-3);
+}
+
+.nota__tabela
+{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.nota__tabela tbody td
+{
+    padding: var(--rf-space-2) 0;
+    font-size: var(--rf-text-label);
+    line-height: var(--rf-leading-label);
+    vertical-align: middle;
+}
+
+.nota__linha--tarifa td
+{
+    color: var(--rf-text-muted-foreground);
+}
+
+.nota__tabela tfoot td
+{
+    padding: var(--rf-space-3);
+    background-color: var(--rf-field);
+    font-weight: var(--rf-weight-semibold);
+}
+
+.nota__tabela tfoot td:first-child
+{
+    border-radius: var(--rf-radius-control) 0 0 var(--rf-radius-control);
+}
+
+.nota__tabela tfoot td:last-child
+{
+    border-radius: 0 var(--rf-radius-control) var(--rf-radius-control) 0;
+}
+
+/* ————————————————————————————————————————————————————————————————
+   Responsivo
+   ———————————————————————————————————————————————————————————————— */
+
+@media (max-width: 960px)
+{
+    .grade--cadastros,
+    .grade--tabelas
+    {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .campos
+    {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 640px)
+{
+    .topo__conteudo,
+    .pagina,
+    .rodape
+    {
+        padding-left: var(--rf-space-4);
+        padding-right: var(--rf-space-4);
+    }
+
+    .painel,
+    .cartao
+    {
+        padding: var(--rf-space-4);
+    }
+
+    .notas
+    {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .botao--primario
+    {
+        width: 100%;
+    }
 }

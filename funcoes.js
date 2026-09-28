@@ -1,283 +1,376 @@
-class Cliente
+/**
+ * Calculadora de Comanda — camada de interface.
+ *
+ * Guarda o estado (clientes, produtos e consumo), desenha as tabelas
+ * e chama as regras puras de logica.js.
+ */
+
+(function ()
 {
-    constructor(id, nome, tarifa)
+    "use strict";
+
+    var clientes = [];
+    var produtos = [];
+    var consumo = {};
+    var proximoCliente = 0;
+    var proximoProduto = 0;
+
+    var campoNomeCliente = document.getElementById("nomeCliente");
+    var campoTarifa = document.getElementById("tarifa");
+    var campoNomeProduto = document.getElementById("nomeProduto");
+    var campoPrecoProduto = document.getElementById("precoProduto");
+    var campoQuantidadeProduto = document.getElementById("quantidadeProduto");
+
+    var tabelaClientes = document.querySelector("#clientes_cadastrados tbody");
+    var tabelaProdutos = document.querySelector("#produtos_cadastrados tbody");
+    var vazioClientes = document.getElementById("vazio-clientes");
+    var vazioProdutos = document.getElementById("vazio-produtos");
+
+    var avisoCliente = document.getElementById("aviso-cliente");
+    var avisoProduto = document.getElementById("aviso-produto");
+    var avisoCalculo = document.getElementById("aviso-calculo");
+    var notasFiscais = document.getElementById("notas_fiscais");
+
+    /** Escapa texto digitado antes de entrar no HTML. */
+    function escaparHtml(texto)
     {
-        this._id = id;
-        this._nome = nome;
-        this._gastos = [];
-        this._valorGastos = [];
-        this._tarifa = tarifa;
+        return String(texto == null ? "" : texto)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
     }
 
-    get id()
+    /** Mostra (ou limpa) a mensagem de um aviso. */
+    function avisar(elemento, mensagem, tipo)
     {
-        return this._id;
-    }
-
-    set nome(nome)
-    {
-        this._nome = nome;
-    }
-
-    get nome()
-    {
-        return this._nome;
-    }
-
-    set gastos(gastos)
-    {
-        this._gastos = gastos;
-    }
-
-    get gastos()
-    {
-        return this._gastos;
-    }
-
-    set valorGastos(valorGastos)
-    {
-        this._valorGastos = valorGastos;
-    }
-
-    get valorGastos()
-    {
-        return this._valorGastos;
-    }
-
-    set tarifa(tarifa)
-    {
-        this._tarifa = tarifa;
-    }
-
-    get tarifa()
-    {
-        return this._tarifa;
-    }
-
-    somarGastos()
-    {
-        var sum = 0;
-
-        for(var i = 0; i < this._valorGastos.length; i++)
+        if (!elemento)
         {
-            sum += this._valorGastos[i];
+            return;
         }
 
-        return sum;
-    }
-}
-
-class Produto
-{
-    constructor(id, nome, preco, quantidade)
-    {
-        this._id = id;
-        this._nome = nome;
-        this._preco = preco;
-        this._quantidade = quantidade;
+        elemento.textContent = mensagem || "";
+        elemento.hidden = !mensagem;
+        elemento.classList.toggle("aviso--erro", tipo === "erro");
+        elemento.classList.toggle("aviso--atencao", tipo === "atencao");
+        elemento.classList.toggle("aviso--ok", tipo === "ok");
     }
 
-    get id()
+    function existeCliente(id)
     {
-        return this._id;
-    }
-
-    set nome(nome)
-    {
-        this._nome;
-    }
-
-    get nome()
-    {
-        return this._nome;
-    }
-
-    set preco(preco)
-    {
-        this._preco;
-    }
-
-    get preco()
-    {
-        return this._preco;
-    }
-
-    set quantidade(quantidade)
-    {
-        this._quantidade;
-    }
-
-    get quantidade()
-    {
-        return this._quantidade;
-    }
-}
-
-var clientes = [], produtos = [], idCliente = 0, idProduto = 0;
-
-function criarNovoCliente()
-{
-    idCliente++;
-    var nome = document.getElementById("nomeCliente").value;
-    var tarifa = document.querySelector("input[name='tarifa']:checked") == null ? false : true;
-    
-    var novoCliente = new Cliente(idCliente, nome, tarifa);
-    clientes.push(novoCliente);
-    
-    atualizarListaClientes();
-    atualizarListaProdutos();
-}
-
-function atualizarListaClientes()
-{
-    var ids = [], nomes = [];
-    var tabela = document.querySelector("#clientes_cadastrados tbody");
-    var lista = "";
-
-    clientes.map(user => {
-        ids.push(user.id)
-        nomes.push(user.nome);
-    });
-
-    for(var i = 0; i < ids.length; i++)
-    {
-        lista += `<tr> <td>${ids[i]}</td> <td>${nomes[i]}</td> </tr>`;
-
-        tabela.innerHTML = lista;
-    }
-}
-
-function criarNovoProduto()
-{
-    idProduto++;
-    var nome = document.getElementById("nomeProduto").value;
-    var preco = parseFloat(document.getElementById("precoProduto").value);
-    var quantidade = parseInt(document.getElementById("quantidadeProduto").value);
-
-    var novoProduto = new Produto(idProduto, nome, preco, quantidade);
-    produtos.push(novoProduto);
-
-    atualizarListaProdutos();
-}
-
-function atualizarListaProdutos()
-{
-    var ids = [], nomes = [], precos = [], quantidades = [];
-    var idsClientes = [], nomesClientes = [];
-    var tabela = document.querySelector("#produtos_cadastrados tbody");
-    var lista = "";
-
-    produtos.map(produto => {
-        ids.push(produto.id)
-        nomes.push(produto.nome);
-        precos.push(produto.preco);
-        quantidades.push(produto.quantidade);
-    });
-
-    clientes.map(user => {
-        idsClientes.push(user.id)
-        nomesClientes.push(user.nome);
-    });
-
-    for(var i = 0; i < ids.length; i++)
-    {
-        lista += `<tr> <td>${ids[i]}</td> <td>${nomes[i]}</td> <td>R$ ${precos[i].toFixed(2)}</td> <td>${quantidades[i]}</td> <td>`;
-        
-        for(var j = 0; j < idsClientes.length; j++)
+        return clientes.some(function (cliente)
         {
-            lista += ` <label><input type='checkbox' value='${nomesClientes[j]}' name='${ids[i]}'>${nomesClientes[j]}</label> `;
+            return cliente.id === id;
+        });
+    }
+
+    function criarNovoCliente()
+    {
+        var erro = LogicaComanda.validarNovoCliente(campoNomeCliente.value);
+
+        if (erro)
+        {
+            avisar(avisoCliente, erro, "erro");
+            campoNomeCliente.focus();
+            return;
         }
 
-        lista += "</td> </tr>";
+        proximoCliente += 1;
 
-        tabela.innerHTML = lista;
-    }
-}
-
-function calcularComanda()
-{
-    produtos.map(produto => {
-        var quantidadeConsumidores = 0;
-        var caixasMarcadas = document.querySelectorAll(`input[name='${produto.id}']:checked`);
-        console.log(caixasMarcadas);
-        
-        clientes.map(cliente => {
-
-            for(var i = 0; i < caixasMarcadas.length; i++)
-            {
-                if(caixasMarcadas[i].value == cliente.nome)
-                {
-                    quantidadeConsumidores++;
-                    cliente.gastos.push(produto.id);
-                }
-            }
+        clientes.push(
+        {
+            id: proximoCliente,
+            nome: campoNomeCliente.value.trim(),
+            tarifa: campoTarifa.checked
         });
 
-        var valorDividido = (produto.quantidade * produto.preco) / quantidadeConsumidores;
-        console.log("🚀 ~ file: funcoes.js ~ line 210 ~ valorDividido", valorDividido)
+        campoNomeCliente.value = "";
+        campoTarifa.checked = false;
 
-        clientes.map(cliente => {
+        avisar(avisoCliente, "Cliente adicionado.", "ok");
+        atualizarListaClientes();
+        atualizarListaProdutos();
+        campoNomeCliente.focus();
+    }
 
-            if(cliente.gastos.indexOf(produto.id) >= 0)
-            {
-                cliente.valorGastos.push(valorDividido);
-            }
-        });
-    });
+    function criarNovoProduto()
+    {
+        var preco = LogicaComanda.converterNumero(campoPrecoProduto.value);
+        var quantidade = Number(campoQuantidadeProduto.value.trim());
 
-    imprimirNotaFiscal();
-}
+        var erro = LogicaComanda.validarNovoProduto(campoNomeProduto.value, preco, quantidade);
 
-function imprimirNotaFiscal()
-{
-    var notasFiscais = document.querySelector("#notas_fiscais");
-    var nomesProdutos = [];
-
-    produtos.map(produto => {
-        nomesProdutos.push(produto.nome);
-    });
-
-    clientes.map(cliente => {
-
-        if(cliente.tarifa)
+        if (erro)
         {
-            cliente.gastos.push("Tarifa");
-            var soma = cliente.somarGastos();
-            cliente.valorGastos.push(soma*0.1);
+            avisar(avisoProduto, erro, "erro");
+            return;
         }
 
-        var titulo = `<h2>${cliente.nome}</h2>`;
+        proximoProduto += 1;
 
-        var thead = "<thead> <th>Produtos Consumidos</th> <th>Valor a Pagar</th> </thead>"; 
-        
-        var tbody = "<tbody>";
-        for(var i = 0; i < cliente.gastos.length; i++)
+        produtos.push(
         {
-            if(cliente.gastos[i] == "Tarifa")
+            id: proximoProduto,
+            nome: campoNomeProduto.value.trim(),
+            preco: preco,
+            quantidade: quantidade
+        });
+
+        campoNomeProduto.value = "";
+        campoPrecoProduto.value = "";
+        campoQuantidadeProduto.value = "";
+
+        avisar(avisoProduto, "Produto adicionado.", "ok");
+        atualizarListaProdutos();
+        campoNomeProduto.focus();
+    }
+
+    function atualizarListaClientes()
+    {
+        vazioClientes.hidden = clientes.length > 0;
+
+        var linhas = clientes.map(function (cliente)
+        {
+            var selo = cliente.tarifa
+                ? "<span class=\"selo selo--tarifa\">" + LogicaComanda.TARIFA_PERCENTUAL + "%</span>"
+                : "<span class=\"texto-sutil\">—</span>";
+
+            return "<tr>" +
+                "<td class=\"celula--id rf-code\">" + escaparHtml(cliente.id) + "</td>" +
+                "<td>" + escaparHtml(cliente.nome) + "</td>" +
+                "<td>" + selo + "</td>" +
+                "</tr>";
+        });
+
+        tabelaClientes.innerHTML = linhas.join("");
+    }
+
+    function atualizarListaProdutos()
+    {
+        vazioProdutos.hidden = produtos.length > 0;
+
+        var linhas = produtos.map(function (produto)
+        {
+            var marcados = consumo[produto.id] || [];
+
+            var consumidores;
+            if (clientes.length === 0)
             {
-                tbody += `<tr> <td>Tarifa</td> <td>${cliente.valorGastos[i].toFixed(2)}</td> </tr>`;
+                consumidores = "<span class=\"texto-sutil\">Cadastre clientes para marcar</span>";
             }
             else
             {
-                tbody += `<tr> <td>${nomesProdutos[cliente.gastos[i]-1]}</td> <td>${cliente.valorGastos[i].toFixed(2)}</td> </tr>`;
+                consumidores = clientes.map(function (cliente)
+                {
+                    var marcado = marcados.indexOf(cliente.id) >= 0 ? " checked" : "";
+
+                    return "<label class=\"opcao-consumo\">" +
+                        "<input type=\"checkbox\" data-produto=\"" + escaparHtml(produto.id) + "\" value=\"" + escaparHtml(cliente.id) + "\"" + marcado + ">" +
+                        "<span>" + escaparHtml(cliente.nome) + "</span>" +
+                        "</label>";
+                }).join("");
             }
+
+            return "<tr>" +
+                "<td class=\"celula--id rf-code\">" + escaparHtml(produto.id) + "</td>" +
+                "<td>" + escaparHtml(produto.nome) + "</td>" +
+                "<td class=\"celula--valor rf-code\">" + escaparHtml(LogicaComanda.formatarMoeda(produto.preco)) + "</td>" +
+                "<td class=\"celula--num rf-code\">" + escaparHtml(produto.quantidade) + "</td>" +
+                "<td><div class=\"consumidores\">" + consumidores + "</div></td>" +
+                "</tr>";
+        });
+
+        tabelaProdutos.innerHTML = linhas.join("");
+    }
+
+    function renderizarNotas(notas)
+    {
+        var cartoes = notas.map(function (nota)
+        {
+            var selo = nota.tarifa
+                ? "<span class=\"selo selo--tarifa\">Tarifa " + LogicaComanda.TARIFA_PERCENTUAL + "%</span>"
+                : "";
+
+            var linhas = nota.itens.map(function (item)
+            {
+                return "<tr>" +
+                    "<td>" + escaparHtml(item.descricao) + "</td>" +
+                    "<td class=\"celula--valor rf-code\">" + escaparHtml(LogicaComanda.formatarMoeda(item.valor)) + "</td>" +
+                    "</tr>";
+            }).join("");
+
+            if (!linhas)
+            {
+                linhas = "<tr><td class=\"texto-sutil\" colspan=\"2\">Nenhum consumo marcado</td></tr>";
+            }
+
+            var linhaTarifa = nota.tarifa
+                ? "<tr class=\"nota__linha--tarifa\">" +
+                    "<td>Tarifa (" + LogicaComanda.TARIFA_PERCENTUAL + "%)</td>" +
+                    "<td class=\"celula--valor rf-code\">" + escaparHtml(LogicaComanda.formatarMoeda(nota.tarifaValor)) + "</td>" +
+                    "</tr>"
+                : "";
+
+            return "<article class=\"nota rf-content-panel\">" +
+                "<header class=\"nota__cabecalho\">" +
+                    "<h3 class=\"rf-label\">" + escaparHtml(nota.nome) + "</h3>" +
+                    selo +
+                "</header>" +
+                "<table class=\"nota__tabela\">" +
+                    "<tbody>" + linhas + linhaTarifa + "</tbody>" +
+                    "<tfoot>" +
+                        "<tr>" +
+                            "<td>Total</td>" +
+                            "<td class=\"celula--valor rf-code\">" + escaparHtml(LogicaComanda.formatarMoeda(nota.total)) + "</td>" +
+                        "</tr>" +
+                    "</tfoot>" +
+                "</table>" +
+                "</article>";
+        });
+
+        notasFiscais.innerHTML = cartoes.join("");
+    }
+
+    function calcularComanda()
+    {
+        if (clientes.length === 0)
+        {
+            avisar(avisoCalculo, "Cadastre pelo menos um cliente.", "erro");
+            return;
         }
-        tbody += "</tbody>";
-        
-        var tfoot = `<tfoot> <tr> <td>Valor Total:</td> <td>R$ ${cliente.somarGastos().toFixed(2)}</td> </tr> </tfoot>`;
-        
-        var tabela = `<table>${thead}${tbody}${tfoot}</table>`;
-        
-        var conteudo = titulo + tabela;
 
-        var notaIndividual = `<div class='nota_individual'>${conteudo}</div>`;
+        if (produtos.length === 0)
+        {
+            avisar(avisoCalculo, "Cadastre pelo menos um produto.", "erro");
+            return;
+        }
 
-        notasFiscais.innerHTML += notaIndividual;
+        var semConsumidor = produtos.filter(function (produto)
+        {
+            var marcados = consumo[produto.id] || [];
+
+            return !marcados.some(function (id)
+            {
+                return existeCliente(id);
+            });
+        }).map(function (produto)
+        {
+            return produto.nome;
+        });
+
+        if (semConsumidor.length === produtos.length)
+        {
+            avisar(avisoCalculo, "Marque quem consumiu pelo menos um produto.", "erro");
+            return;
+        }
+
+        if (semConsumidor.length > 0)
+        {
+            avisar(avisoCalculo, "Sem consumidor marcado (ficou de fora): " + semConsumidor.join(", ") + ".", "atencao");
+        }
+        else
+        {
+            avisar(avisoCalculo, "", "");
+        }
+
+        renderizarNotas(LogicaComanda.ratearComanda(clientes, produtos, consumo));
+    }
+
+    function registrarConsumo(evento)
+    {
+        var caixa = evento.target;
+
+        if (!caixa || caixa.type !== "checkbox")
+        {
+            return;
+        }
+
+        var produtoId = Number(caixa.getAttribute("data-produto"));
+        var clienteId = Number(caixa.value);
+
+        if (!produtoId || !clienteId)
+        {
+            return;
+        }
+
+        var marcados = consumo[produtoId] || [];
+        var posicao = marcados.indexOf(clienteId);
+
+        if (caixa.checked && posicao < 0)
+        {
+            marcados.push(clienteId);
+        }
+        else if (!caixa.checked && posicao >= 0)
+        {
+            marcados.splice(posicao, 1);
+        }
+
+        consumo[produtoId] = marcados;
+    }
+
+    function iniciarTema()
+    {
+        var botao = document.getElementById("botao-tema");
+
+        function atualizarRotulo()
+        {
+            var escuro = document.documentElement.getAttribute("data-theme") !== "light";
+            var rotulo = escuro ? "Ativar tema claro" : "Ativar tema escuro";
+
+            botao.setAttribute("aria-label", rotulo);
+            botao.setAttribute("title", rotulo);
+        }
+
+        botao.addEventListener("click", function ()
+        {
+            var novo = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+
+            document.documentElement.setAttribute("data-theme", novo);
+
+            try
+            {
+                localStorage.setItem("rafastos-theme", novo);
+            }
+            catch (erro)
+            {
+                /* armazenamento indisponível: segue só na sessão */
+            }
+
+            atualizarRotulo();
+        });
+
+        atualizarRotulo();
+    }
+
+    function aoPressionarEnter(evento, acao)
+    {
+        if (evento.key === "Enter")
+        {
+            evento.preventDefault();
+            acao();
+        }
+    }
+
+    document.getElementById("adicionarCliente").addEventListener("click", criarNovoCliente);
+    document.getElementById("adicionarProduto").addEventListener("click", criarNovoProduto);
+    document.getElementById("calcular").addEventListener("click", calcularComanda);
+    document.getElementById("produtos_cadastrados").addEventListener("change", registrarConsumo);
+
+    campoNomeCliente.addEventListener("keydown", function (evento)
+    {
+        aoPressionarEnter(evento, criarNovoCliente);
     });
 
+    [campoNomeProduto, campoPrecoProduto, campoQuantidadeProduto].forEach(function (campo)
+    {
+        campo.addEventListener("keydown", function (evento)
+        {
+            aoPressionarEnter(evento, criarNovoProduto);
+        });
+    });
 
-}
-
-document.getElementById("adicionarCliente").onclick = criarNovoCliente;
-document.getElementById("adicionarProduto").onclick = criarNovoProduto;
-document.getElementById("calcular").onclick = calcularComanda;
+    vazioClientes.hidden = false;
+    vazioProdutos.hidden = false;
+    iniciarTema();
+})();
